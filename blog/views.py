@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Post, Comment
-from django.core.paginator import Paginator, EmptyPage,\
-                                  PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, \
+    PageNotAnInteger
 from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from taggit.models import Tag
 from django.db.models import Count
 from django.http import Http404
+
 
 # Create your views here.
 
@@ -33,7 +34,7 @@ def post_list(request, tag_slug=None):
     return render(request,
                   'blog/post/list.html',
                   {'posts': posts,
-                          'tag': tag})
+                   'tag': tag})
 
 
 def post_detail(request, year, month, day, post):
@@ -51,16 +52,16 @@ def post_detail(request, year, month, day, post):
     # List of similar posts
     post_tags_ids = post.tags.values_list('id', flat=True)
     similar_posts = Post.published.filter(tags__in=post_tags_ids) \
-                                  .exclude(id=post.id)
+        .exclude(id=post.id)
     similar_posts = similar_posts.annotate(same_tags=Count('tags')) \
-                                 .order_by('-same_tags', '-publish')[:4]
+                        .order_by('-same_tags', '-publish')[:4]
 
     return render(request,
                   'blog/post/detail.html',
                   {'post': post,
-                          'comments': comments,
-                          'form': form,
-                          'similar_posts': similar_posts})
+                   'comments': comments,
+                   'form': form,
+                   'similar_posts': similar_posts})
 
 
 class PostListView(ListView):
@@ -96,8 +97,8 @@ def post_share(request, post_id):
     else:
         form = EmailPostForm()
     return render(request, 'blog/post/share.html', {'post': post,
-                                                                        'form': form,
-                                                                        'sent': sent})
+                                                    'form': form,
+                                                    'sent': sent})
 
 
 @require_POST
@@ -114,6 +115,6 @@ def post_comment(request, post_id):
         # Save the comment to the database
         comment.save()
     return render(request, 'blog/post/comment.html',
-                                {'post': post,
-                                        'form': form,
-                                        'comment': comment})
+                  {'post': post,
+                   'form': form,
+                   'comment': comment})
